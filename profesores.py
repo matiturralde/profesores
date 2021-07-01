@@ -5,7 +5,7 @@ import streamlit as st
 import io
 
 col1, col2, col3 = st.beta_columns(3)
-image = 'https://res.cloudinary.com/hdsqazxtw/image/upload/f_auto/v1579032128/coder-logo-white_t41xzb.png'
+image = 'https://res.cloudinary.com/hdsqazxtw/image/upload/v1559681445/logo_coderhouse_3_bllxal.png'
 col2.image(image)
 
 st.markdown("""
