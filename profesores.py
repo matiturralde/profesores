@@ -1,6 +1,5 @@
 from collections import namedtuple
 import altair as alt
-import math
 import pandas as pd
 import streamlit as st
 import io
@@ -34,4 +33,4 @@ for file in multiple_files:
     data = io.BytesIO(file.getbuffer())
     file_container.write(pd.read_csv(data))
 
-st.write("### Code")
+st.write("###")
