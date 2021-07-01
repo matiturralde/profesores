@@ -22,15 +22,10 @@ st.markdown('<p class="big-font">Liquidación Profesores</p>', unsafe_allow_html
 #st.text('Cargar archivo de liquidación mensual:')
 #st.sidebar
 
-multiple_files = st.file_uploader(
-    'Subir csv:',
-    accept_multiple_files=True
-)
+multiple_files = st.file_uploader('Subir csv',type="csv", accept_multiple_files=True)
 for file in multiple_files:
-    file_container = st.beta_expander(
-        f"File name: {file.name} ({file.size})"
-    )
-    data = io.BytesIO(file.getbuffer())
-    file_container.write(pd.read_csv(data))
-
+	dataframe = pd.read_csv(file)
+	file.seek(0)
+	st.write(dataframe)
+    
 st.write("###")
