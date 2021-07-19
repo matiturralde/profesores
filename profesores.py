@@ -183,5 +183,6 @@ if multiple_files is not None:
         submit_button = st.button(label='Exportar .txt para BBVA')
         if submit_button:
             'Listo!'
+
             np.savetxt(NOMBRE_ARCHIVO+ '.txt', liquidacion_profesores, fmt='%s',delimiter=' ', newline='', header='', footer='', comments='# ', encoding=None)
             #st.markdown(linko, unsafe_allow_html=True)
