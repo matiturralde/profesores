@@ -3,8 +3,6 @@ import altair as alt
 import pandas as pd
 import numpy as np
 import streamlit as st
-from io import BytesIO
-import base64
 
 favicon = 'https://res.cloudinary.com/hdsqazxtw/image/upload/v1559681445/logo_coderhouse_1_rec5vl.png'
 st.set_page_config(page_title='Profesores', page_icon = favicon, initial_sidebar_state = 'auto', layout="centered")
@@ -202,11 +200,6 @@ if multiple_files is not None:
             to_save = liquidacion_profesores
             href = f'<a href="data:text/plain;charset=UTF-8,{to_save}" download="{reference}.txt">Click para bajar archivo</a> ({reference}.txt)'
             st.markdown(href, unsafe_allow_html=True)
-
-
-
-
-
 
         " "
         " "
