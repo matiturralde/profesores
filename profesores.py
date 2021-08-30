@@ -3,7 +3,8 @@ import altair as alt
 import pandas as pd
 import numpy as np
 import streamlit as st
-import io
+from io import BytesIO
+import base64
 
 favicon = 'https://res.cloudinary.com/hdsqazxtw/image/upload/v1559681445/logo_coderhouse_1_rec5vl.png'
 st.set_page_config(page_title='Profesores', page_icon = favicon, initial_sidebar_state = 'auto', layout="centered")
@@ -38,11 +39,20 @@ if multiple_files is not None:
     for file in multiple_files:
         df.rename(columns = {' Total': 'total'}, inplace = True)
         df.rename(columns = {'Fecha de pago': 'Fecha_de_pago'}, inplace = True)
+        df.rename(columns = {'proveedor': 'profesor'}, inplace = True)
+        #df['monto total'] = df['monto total'].fillna(0)
+        #df['monto total'] = df['monto total'].str.replace(' ','')
+        #df['monto total'] = df['monto total'].str.replace('-','0')
+        #df['monto total'] = df['monto total'].str.replace(',','.').astype('float')
         df['total'] = df['total'].fillna(0)
         df['total'] = df['total'].str.replace(' ','')
         df['total'] = df['total'].str.replace('-','0')
-        df['total'] = df['total'].str.replace('.','')
-        df['total'] = df['total'].str.replace(',','.').astype('float')
+        #df['total'] = df['total'].str.replace('.','')
+        #df['total'] = df['total'].str.replace(',','.').astype('float')
+        df['total'] = df['total'].str.replace(',','').astype('float')
+        df['cuit'] = df['cuit'].astype('string')
+        df['cbu'] = df['cbu'].astype('string')
+        df['email'] = df['email'].astype('string')
         st.write('Monto total:' , "ARS {0:,.2f}".format(df['total'].sum()))
         " "
         " "
@@ -53,6 +63,7 @@ if multiple_files is not None:
             'Monto total a pagar en fecha seleccionada: ARS', monto_total
         " "
         " "
+        orden_compra = st.text_input("Insertar último número de orden de pago anterior:", 0)
         # txt base:
         with open('PAP Coderhouse.txt', encoding='latin-1') as f:
             txt = f.readlines()
@@ -61,7 +72,7 @@ if multiple_files is not None:
 
         CUIT = '0030714528749'
         SUCURSAL_CODER = '00170052260100075195'
-        FECHA_DE_PAGO = str(fecha_liquidacion)
+        FECHA_DE_PAGO = str(fecha_liquidacion)[0:4] + str(fecha_liquidacion)[5:7] + str(fecha_liquidacion)[8:10]
         IMPORTE_RAW = "{:.2f}".format(round(df_sum_fecha['total'].sum(), 2))
         IMPORTE = IMPORTE_RAW.replace('.','')
         CEROS_IMPORTE = str(IMPORTE).zfill(13)
@@ -90,6 +101,8 @@ if multiple_files is not None:
 
         #for p in range (0,df_sum_fecha.shape[0]):
 
+        NRO_ORDEN = int(orden_compra)
+        
         for p in range (0,df_sum_fecha.shape[0]):
 
             #datos proveedor:
@@ -109,6 +122,7 @@ if multiple_files is not None:
             CUIT_PROV = str(df_sum_fecha['cuit'].iloc[p])
             CEROS = str(0).zfill(15)
             NOMBRE_PROVEEDOR = (df_sum_fecha['profesor'].iloc[p]).upper()
+            NOMBRE_PROVEEDOR = str(NOMBRE_PROVEEDOR).replace('I\xad','I')
             CEROS_NOMBRE_PROVEEDOR = str(NOMBRE_PROVEEDOR).ljust(40)
             CBU = (df_sum_fecha['cbu'].iloc[p]).replace("'","")
             CHECKBBVA = ''
@@ -179,10 +193,27 @@ if multiple_files is not None:
         txt[7] = txt[7][:50] + CEROS_CANTIDAD_TOTAL + txt[7][60:]
         liquidacion_profesores.append(txt[7])
         NOMBRE_ARCHIVO = 'PAPR' + FECHA_DE_PAGO
-
+        " "
+        " "
         submit_button = st.button(label='Exportar .txt para BBVA')
         if submit_button:
-            'Listo!'
+            #bajar = np.savetxt(NOMBRE_ARCHIVO+ '.txt', liquidacion_profesores, fmt='%s',delimiter=' ', newline='', header='', footer='', comments='# ', encoding=None)
+            reference = NOMBRE_ARCHIVO
+            to_save = liquidacion_profesores
+            href = f'<a href="data:text/plain;charset=UTF-8,{to_save}" download="{reference}.txt">Click para bajar archivo</a> ({reference}.txt)'
+            st.markdown(href, unsafe_allow_html=True)
 
-            np.savetxt(NOMBRE_ARCHIVO+ '.txt', liquidacion_profesores, fmt='%s',delimiter=' ', newline='', header='', footer='', comments='# ', encoding=None)
-            #st.markdown(linko, unsafe_allow_html=True)
+
+
+
+
+
+        " "
+        " "
+        error_fila = st.text_input("Insertar número de fila con error en BBVA:", 0)
+        error_fila = int(error_fila)-1
+        'CUIT: ' + liquidacion_profesores[error_fila][64:75]
+        'PROVEEDOR: ' + liquidacion_profesores[error_fila][75:115]
+        'CBU: ' + liquidacion_profesores[error_fila][133:155]
+        'mail: ' + liquidacion_profesores[error_fila][238:278]
+
