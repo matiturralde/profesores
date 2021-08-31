@@ -104,7 +104,7 @@ if multiple_files is not None:
         for p in range (0,df_sum_fecha.shape[0]):
 
             #datos proveedor:
-            CUIT_BENEFICIARIO = '00' + df_sum_fecha['cuit'].iloc[p]
+            CUIT_BENEFICIARIO = '00' + df_sum_fecha['cuit'].iloc[p][0:11]
             NRO_PAGO = pago
             NRO_PROVEEDOR = p + 1
             NRO_ORDEN = p + 1
@@ -117,7 +117,7 @@ if multiple_files is not None:
             IMPORTE_RAW_PROV = "{:.2f}".format(round(df_sum_fecha['total'].iloc[p].sum(), 2))
             IMPORTE_PROV = IMPORTE_RAW_PROV.replace('.','')
             CEROS_IMPORTE_PROV = str(IMPORTE_PROV).zfill(13)
-            CUIT_PROV = str(df_sum_fecha['cuit'].iloc[p])
+            CUIT_PROV = str(df_sum_fecha['cuit'].iloc[p][0:11])
             CEROS = str(0).zfill(15)
             NOMBRE_PROVEEDOR = (df_sum_fecha['profesor'].iloc[p]).upper()
             NOMBRE_PROVEEDOR = str(NOMBRE_PROVEEDOR).replace('I\xad','I')
@@ -196,9 +196,15 @@ if multiple_files is not None:
         submit_button = st.button(label='Exportar .txt para BBVA')
         if submit_button:
             #bajar = np.savetxt(NOMBRE_ARCHIVO+ '.txt', liquidacion_profesores, fmt='%s',delimiter=' ', newline='', header='', footer='', comments='# ', encoding=None)
+            
+            liquidacion_profesores_txt = open("PAP.txt", "w")
+            for element in liquidacion_profesores:
+                liquidacion_profesores_txt.write(element)
+            liquidacion_profesores_txt.close()
+            
             reference = NOMBRE_ARCHIVO
-            to_save = liquidacion_profesores
-            href = f'<a href="data:text/plain;charset=UTF-8,{to_save}" download="{reference}.txt">Click para bajar archivo</a> ({reference}.txt)'
+            to_save = liquidacion_profesores_txt
+            href = f'<a href="data:text/plain;charset=UTF-8,{to_save}" download="{reference}.txt">click para bajar archivo</a> ({reference}.txt)'
             st.markdown(href, unsafe_allow_html=True)
 
         " "
