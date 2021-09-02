@@ -3,6 +3,7 @@ import altair as alt
 import pandas as pd
 import numpy as np
 import streamlit as st
+from pathlib import Path
 
 favicon = 'https://res.cloudinary.com/hdsqazxtw/image/upload/v1559681445/logo_coderhouse_1_rec5vl.png'
 st.set_page_config(page_title='Profesores', page_icon = favicon, initial_sidebar_state = 'auto', layout="centered")
@@ -21,7 +22,7 @@ markdown = st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="big-font">Liquidación Profesores</p>', unsafe_allow_html=True)
+st.markdown('<p class="big-font">Liquidación Profesores/Proveedores</p>', unsafe_allow_html=True)
 
 #st.title('Liquidación Profesores:')
 #st.text('Cargar archivo de liquidación mensual:')
@@ -30,7 +31,7 @@ st.markdown('<p class="big-font">Liquidación Profesores</p>', unsafe_allow_html
 multiple_files = st.file_uploader('Subir csv:',type="csv", accept_multiple_files=True)
 if multiple_files is not None:
     for file in multiple_files:
-	    df = pd.read_csv(file)
+	    df = pd.read_csv(file, encoding='latin-1')
 	    st.dataframe(df)
         
 if multiple_files is not None:
@@ -38,11 +39,13 @@ if multiple_files is not None:
         df.rename(columns = {' Total': 'total'}, inplace = True)
         df.rename(columns = {'Fecha de pago': 'Fecha_de_pago'}, inplace = True)
         df.rename(columns = {'proveedor': 'profesor'}, inplace = True)
+        df.rename(columns = {'factura': 'Factura'}, inplace = True)
         #df['monto total'] = df['monto total'].fillna(0)
         #df['monto total'] = df['monto total'].str.replace(' ','')
         #df['monto total'] = df['monto total'].str.replace('-','0')
         #df['monto total'] = df['monto total'].str.replace(',','.').astype('float')
         df['total'] = df['total'].fillna(0)
+        df['total'] = df['total'].astype('string')
         df['total'] = df['total'].str.replace(' ','')
         df['total'] = df['total'].str.replace('-','0')
         #df['total'] = df['total'].str.replace('.','')
@@ -196,16 +199,19 @@ if multiple_files is not None:
         submit_button = st.button(label='Exportar .txt para BBVA')
         if submit_button:
             #bajar = np.savetxt(NOMBRE_ARCHIVO+ '.txt', liquidacion_profesores, fmt='%s',delimiter=' ', newline='', header='', footer='', comments='# ', encoding=None)
-            
-            liquidacion_profesores_txt = open("PAP.txt", "w")
+            downloads_path = str(Path.home() / "Downloads")
+            liquidacion_profesores_txt = open(downloads_path+"/"+NOMBRE_ARCHIVO+".txt", "w")
             for element in liquidacion_profesores:
                 liquidacion_profesores_txt.write(element)
             liquidacion_profesores_txt.close()
+            'Listo! (ver carpeta de descargas)'
+            href = f'<a href={NOMBRE_ARCHIVO+".txt"}>click para bajar archivo</a>'
             
-            reference = NOMBRE_ARCHIVO
-            to_save = liquidacion_profesores_txt
-            href = f'<a href="data:text/plain;charset=UTF-8,{to_save}" download="{reference}.txt">click para bajar archivo</a> ({reference}.txt)'
-            st.markdown(href, unsafe_allow_html=True)
+            #reference = NOMBRE_ARCHIVO
+            #to_save = liquidacion_profesores_txt
+            #href = f'<a href="data:text/plain;charset=UTF-8,{to_save}" download="{reference}.txt">click para bajar archivo</a> ({reference}.txt)'
+            #st.markdown(href, unsafe_allow_html=True)
+            
 
         " "
         " "
